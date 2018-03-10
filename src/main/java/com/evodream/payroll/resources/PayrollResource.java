@@ -179,6 +179,21 @@ public class PayrollResource {
 	 }
 	 
 	 @GET
+	 @Path("/periode")
+	 public Response getPeriode() {
+	  String query = "select periode from periode order by id limit 1";
+	  ResultSet rs = DatabaseHelper.getInstance().query(query);
+	  try {
+	   while(rs.next()) {
+	    return Response.status(Status.OK).entity(rs.getString("periode")).build();
+	   }
+	  } catch (SQLException e) {
+	   e.printStackTrace();
+	  }
+	  return Response.status(Status.OK).entity("0").build();
+	 }
+	 
+	 @GET
 	 @Path("/debtemployee")
 	 public Response getDebtEmployee() {
 	  String query = "select count(*) as total from history_pinjaman where periode = (select periode from periode order by id desc limit 1)";
