@@ -119,8 +119,15 @@ public class DatabaseClass {
 				employee.setJoin(rs.getString("tanggal_masuk"));
 				employee.setOut(rs.getString("tanggal_keluar"));
 				employee.setFingerprint(rs.getBytes("fingerprint"));
-				FingerprintTemplate probe = new FingerprintTemplate().dpi(500).create(rs.getBytes("fingerprint"));
-				employee.setFinger(probe);
+				try {
+					if(employee.getFingerprint().length>0) {
+						FingerprintTemplate probe = new FingerprintTemplate().dpi(500).create(rs.getBytes("fingerprint"));
+						employee.setFinger(probe);						
+					}
+				}catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 				employee.setBalance(rs.getBigDecimal("saldo"));
 				employee.setDebt(rs.getBigDecimal("pinjaman"));
 				employee.setUmk(rs.getBigDecimal("umk"));
