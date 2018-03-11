@@ -13,6 +13,7 @@ import com.evodream.payroll.database.DatabaseClass;
 import com.evodream.payroll.exception.DataNotFoundException;
 import com.evodream.payroll.helper.DatabaseHelper;
 import com.evodream.payroll.model.Employee;
+import com.machinezoo.sourceafis.FingerprintTemplate;
 
 public class PayrollService {
 	
@@ -24,6 +25,12 @@ public class PayrollService {
 		return new ArrayList<Employee>(employees.values());
 	}
 	
+	public List<Employee> getEmployees(String filter, int offset, int limit, String sort){
+		return new ArrayList<Employee>(DatabaseClass.getEmployees(filter, offset, limit, sort).values());
+	}
+	
+	
+
 	public Employee getEmployee(String id) {
 		Employee employee = employees.get(id);
 		if(employee == null) throw new DataNotFoundException("Message with id " + id + " not found");
@@ -38,6 +45,16 @@ public class PayrollService {
 	public void getEmployeesDebt() {
 		employees.clear();
 		employees = DatabaseClass.getDebtEmployees();
+	}
+	
+	public Employee getEmployeesDebt(String id) {
+		employees.clear();
+		employees = DatabaseClass.getDebtEmployees();
+		Employee employee = employees.get(id);
+		if(employee == null) throw new DataNotFoundException("Message with id " + id + " not found");
+		employee.setFingerprint(null);
+		employee.setFinger(null);
+		return employee;
 	}
 	
 	public Employee updateEmployee(Employee employee) {

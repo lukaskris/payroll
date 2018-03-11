@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -29,11 +31,13 @@ import com.evodream.payroll.database.DatabaseClass;
 import com.evodream.payroll.exception.DataNotFoundException;
 import com.evodream.payroll.helper.DatabaseHelper;
 import com.evodream.payroll.model.Employee;
+import com.evodream.payroll.model.Position;
 import com.evodream.payroll.service.PayrollService;
 import com.machinezoo.sourceafis.FingerprintMatcher;
 import com.machinezoo.sourceafis.FingerprintTemplate;
 import com.sun.jersey.core.header.FormDataContentDisposition;
 import com.sun.jersey.multipart.FormDataParam;
+import com.sun.research.ws.wadl.Application;
 
 @Path("/employee")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -42,15 +46,44 @@ public class PayrollResource {
 	PayrollService employeeService = new PayrollService();
 	
 	@GET
-	public List<Employee> getEmployees(){
-		return employeeService.getAllEmployee();
+	public List<Employee> getEmployees(@QueryParam("filter") String filter, @QueryParam("offset") int offset, @QueryParam("limit") int limit, @QueryParam("sort") String sort ){
+		
+		return employeeService.getEmployees(filter, offset, limit, sort);
 	}
 	
 	@GET
-	@Path("{id}")
+	@Path("/find/{id}")
 	public Employee getEmployee(@PathParam("id") String id) {
-		Employee employee = employeeService.getEmployee(id);
-		return employee;
+		return employeeService.getEmployeesDebt(id);
+	}
+	
+//	@GET
+//	@Path("{id}")
+//	public Employee getEmployee(@PathParam("id") String id) {
+//		Employee employee = employeeService.getEmployee(id);
+//		return employee;
+//	}
+	
+	@GET
+	@Produces( MediaType.APPLICATION_JSON )
+	@Path("/position")
+	public List<Position> getBagian() {
+		String query = "select * from bagian";
+		ResultSet rs = DatabaseHelper.getInstance().query(query);
+		List<Position> pos = new ArrayList();
+		try {
+			while(rs.next()) {
+				Position posNew = new Position();
+				posNew.setId(rs.getString(1));
+				posNew.setNama(rs.getString(2));
+				pos.add(posNew);
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(pos.toString());
+		return pos;
 	}
 	
 	@GET
@@ -68,7 +101,15 @@ public class PayrollResource {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 	}
-	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Path("/addkaryawan") 
+	public Response uploadFile(Employee employee) {
+		if(DatabaseHelper.getInstance().insertKaryawan(employee) > 0) {
+			return Response.status(Status.OK).entity(employee).build();			
+		}
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	}
 	
 //	Buat peminjaman uang
 	@POST
@@ -177,7 +218,7 @@ public class PayrollResource {
 	  }
 	  return Response.status(Status.OK).entity("0").build();
 	 }
-	 
+	 	 
 	 @GET
 	 @Path("/periode")
 	 public Response getPeriode() {

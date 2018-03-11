@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.evodream.payroll.model.Employee;
 import com.mysql.jdbc.PreparedStatement;
 
 import java.io.File;
@@ -95,9 +96,29 @@ public class DatabaseHelper {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
 		return id;
+	}
+	
+	public Integer insertKaryawan(Employee employee) {
+		PreparedStatement statement;
+		String query = "INSERT INTO karyawan (nik, nama, gajiharian, "
+				+ "gajitotal, bagian_id, fingerprint, tanggal_masuk) "
+				+ "values(?, ?, ?, ?, ?, ?, now())";
+		
+		try {
+			statement = (PreparedStatement) connection.prepareStatement(query);
+			statement.setString(1, employee.getNik());
+			statement.setString(2, employee.getName());
+			statement.setBigDecimal(3, employee.getSalaryPerDay());
+			statement.setBigDecimal(4, employee.getSalary());
+			statement.setString(5, employee.getPosition());
+			statement.setBytes(6, employee.getFingerprint());
+			return statement.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
+		
 	}
 
 	public void update(Map<String, String> data, String table) {
