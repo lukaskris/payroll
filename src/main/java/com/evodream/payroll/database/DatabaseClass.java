@@ -69,7 +69,6 @@ public class DatabaseClass {
 		
 		if(limit != 0) query = query + " limit " + String.valueOf(limit);
 		if(offset != 0) query = query + " offset " + String.valueOf(offset);
-		System.out.println(query);
 		ResultSet rs = DatabaseHelper.getInstance().query(query);
 		try {
 			while (rs.next()) {
