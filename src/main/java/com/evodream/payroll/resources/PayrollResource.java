@@ -155,7 +155,9 @@ public class PayrollResource {
 	@POST
 	@Path("/approvedebtmoney")
 	public Response approveDebtMoney(Employee employee) {
-
+		if(employeeService.ApproveDebt(employee) != -1){
+			return Response.status(Status.OK).build();
+		}
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	}
 	

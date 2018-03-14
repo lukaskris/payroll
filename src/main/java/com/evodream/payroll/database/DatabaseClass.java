@@ -35,7 +35,7 @@ public class DatabaseClass {
 						FingerprintTemplate probe = new FingerprintTemplate().dpi(500).create(rs.getBytes("fingerprint"));
 						employee.setFinger(probe);					
 					}
-				}catch(Exception e) {}
+				}catch(Exception ignored) {}
 				employee.setBalance(rs.getBigDecimal("saldo"));
 				employee.setUmk(rs.getBigDecimal("umk"));
 				

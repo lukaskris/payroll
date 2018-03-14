@@ -104,13 +104,18 @@ public class PayrollService {
 	
 	//pinjam uang (butuh cuman nik dan nominal pinjaman)
 	public Integer ApproveDebt(Employee employee) {
-		String query = "INSERT INTO history_pinjaman(karyawan_id, pinjaman, periode, create_at) values(?,?,?,now())";
-		
+		String query = "INSERT INTO history_pinjaman(karyawan_id, pinjaman, periode, sudah_umk, create_at) values(?,?, (select periode from periode order by id desc limit 1),?,now())";
+		int umk = 0;
+
+		if(employee.getBalance().intValue() >= employee.getUmk().intValue()){
+			umk = 1;
+		}
 		PreparedStatement ps;
 		try {
 			ps = DatabaseHelper.getInstance().getConnection().prepareStatement(query);
 			ps.setString(1, employee.getNik());
 			ps.setBigDecimal(2, employee.getDebt());
+			ps.setInt(3, umk);
 			ps.executeUpdate();
 			return UpdateSaldo(employee.getDebt(), employee.getNik()); 
 		} catch (SQLException e) {
