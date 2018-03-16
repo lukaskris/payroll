@@ -102,13 +102,30 @@ public class PayrollResource {
 		}
 	}
 	@POST
-	@Consumes(MediaType.APPLICATION_JSON)
 	@Path("/addkaryawan") 
 	public Response uploadFile(Employee employee) {
 		if(DatabaseHelper.getInstance().insertKaryawan(employee) > 0) {
 			return Response.status(Status.OK).entity(employee).build();			
 		}
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	}
+
+	//buat cek untuk mau ambil uang
+	@POST
+	@Path("/upload/{id}")
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	public Response upload(@FormDataParam("upload") InputStream is, @FormDataParam("upload") FormDataContentDisposition formData, @PathParam("id") String nik) {
+		try {
+
+			byte[] bytes = IOUtils.toByteArray(is);
+			DatabaseHelper.getInstance().updateFinger(nik, bytes);
+			return Response.status(Status.OK).entity("Ok").build();
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
 	}
 	
 //	Buat peminjaman uang

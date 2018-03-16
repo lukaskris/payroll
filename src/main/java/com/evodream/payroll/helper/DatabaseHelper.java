@@ -104,7 +104,6 @@ public class DatabaseHelper {
 		String query = "INSERT INTO karyawan (nik, nama, gajiharian, "
 				+ "gajitotal, bagian_id, fingerprint, tanggal_masuk) "
 				+ "values(?, ?, ?, ?, ?, ?, now())";
-		
 		try {
 			statement = (PreparedStatement) connection.prepareStatement(query);
 			statement.setString(1, employee.getNik());
@@ -119,6 +118,20 @@ public class DatabaseHelper {
 		}
 		return -1;
 		
+	}
+
+	public int updateFinger(String nik, byte[] data){
+		PreparedStatement statement;
+		String query = "UPDATE karyawan SET fingerprint = ? where nik = ?";
+		try {
+			statement = (PreparedStatement) connection.prepareStatement(query);
+			statement.setBytes(1, data);
+			statement.setString(2, nik);
+			return statement.executeUpdate();
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		return -1;
 	}
 
 	public void update(Map<String, String> data, String table) {
